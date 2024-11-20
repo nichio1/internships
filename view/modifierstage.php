@@ -1,138 +1,132 @@
 <!doctype html>
 <html lang="en">
+<?php
+require_once 'config.php';
 
+// Get the internship ID from URL parameter
+$id = isset($_GET['id']) ? $_GET['id'] : null;
+
+if ($id) {
+    $db = new Database();
+    $conn = $db->getConnection();
+    
+    // Fetch internship details
+    $sql = "SELECT * FROM internship WHERE id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $internship = $result->fetch_assoc();
+    
+    if (!$internship) {
+        // Redirect if internship not found
+        header("Location: listeDesStages.php");
+        exit();
+    }
+    $db->closeConnection();
+}
+?>
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Ajouter un Stage</title>
-  <link rel="shortcut icon" type="image/png" href="../assets/images/logos/seodashlogo.png" />
-  <link rel="stylesheet" href="../../node_modules/simplebar/dist/simplebar.min.css">
-  <link rel="stylesheet" href="../assets/css/styles.min.css" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Modifier un Stage</title>
+    <link rel="shortcut icon" type="image/png" href="../assets/images/logos/seodashlogo.png" />
+    <link rel="stylesheet" href="../../node_modules/simplebar/dist/simplebar.min.css">
+    <link rel="stylesheet" href="../assets/css/styles.min.css" />
 </head>
 
 <body>
-  <!-- Body Wrapper -->
-  <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
-    data-sidebar-position="fixed" data-header-position="fixed">
-    <!-- Sidebar Start -->
-    <aside class="left-sidebar">
-      <div>
-        <div class="brand-logo d-flex align-items-center justify-content-between">
-          <a href="./index.html" class="text-nowrap logo-img">
-            <img src="../assets/images/logos/logo-light.svg" alt="" />
-          </a>
-          <div class="close-btn d-xl-none d-block sidebartoggler cursor-pointer" id="sidebarCollapse">
-            <i class="ti ti-x fs-8"></i>
-          </div>
-        </div>
-        <!-- Sidebar navigation-->
-        <nav class="sidebar-nav scroll-sidebar" data-simplebar="">
-          <ul id="sidebarnav">
-            <li class="nav-small-cap">
-              <i class="ti ti-dots nav-small-cap-icon fs-6"></i>
-              <span class="hide-menu">Home</span>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="ajouterstage.php" aria-expanded="false">
-                <span>
-                  <iconify-icon icon="solar:home-smile-bold-duotone" class="fs-6"></iconify-icon>
-                </span>
-                <span class="hide-menu">Ajouter stage </span>
-              </a>
-              <a class="sidebar-link" href="listeDesStages.php" aria-expanded="false">
-                <span>
-                  <iconify-icon icon="solar:home-smile-bold-duotone" class="fs-6"></iconify-icon>
-                </span>
-                <span class="hide-menu">Listes des stages </span>
-              </a>
-            </li>
-            <!-- Add more sidebar items as needed -->
-          </ul>
-        </nav>
-      </div>
-    </aside>
-    <!-- Sidebar End -->
+    <!-- Body Wrapper -->
+    <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
+        data-sidebar-position="fixed" data-header-position="fixed">
+        <!-- Sidebar Start -->
+        <aside class="left-sidebar">
+            <!-- Previous sidebar content remains the same -->
+            <!-- ... -->
+        </aside>
+        <!-- Sidebar End -->
 
-    <!-- Main Wrapper -->
-    <div class="body-wrapper">
-      <!-- Header Start -->
-      <header class="app-header">
-        <nav class="navbar navbar-expand-lg navbar-light">
-          <ul class="navbar-nav flex-row ms-auto align-items-center">
-            <li class="nav-item">
-              <a class="nav-link nav-icon-hover" href="javascript:void(0)">
-                <i class="ti ti-bell-ringing"></i>
-                <div class="notification bg-primary rounded-circle"></div>
-              </a>
-            </li>
-            <li class="nav-item dropdown">
-              <a class="nav-link nav-icon-hover" href="javascript:void(0)" id="drop2" data-bs-toggle="dropdown">
-                <img src="../assets/images/profile/user-1.jpg" alt="" width="35" height="35" class="rounded-circle">
-              </a>
-              <div class="dropdown-menu dropdown-menu-end">
-                <div class="message-body">
-                  <a href="javascript:void(0)" class="d-flex align-items-center gap-2 dropdown-item">
-                    <i class="ti ti-user fs-6"></i>
-                    <p class="mb-0 fs-3">My Profile</p>
-                  </a>
-                  <a href="./authentication-login.html" class="btn btn-outline-primary mx-3 mt-2 d-block">Logout</a>
-                </div>
-              </div>
-            </li>
-          </ul>
-        </nav>
-      </header>
-      <!-- Header End -->
+        <!-- Main Wrapper -->
+        <div class="body-wrapper">
+            <!-- Header content remains the same -->
+            <!-- ... -->
 
-      <!-- Content Start -->
-      <div class="container-fluid">
-        <div class="card">
-          <div class="card-body">
+            <!-- Content Start -->
+
+            <div class="container-fluid">
+    <div class="card">
+        <div class="card-body">
             <h1 class="card-title fw-semibold mb-4">Modifier un Stage</h1>
-            <form action="ajouter_stage.php" method="POST" enctype="multipart/form-data">
-              <div class="mb-3">
-                <label for="title" class="form-label">Title</label>
-                <input type="text" id="title" name="title" class="form-control" required>
-              </div>
-              <div class="mb-3">
-                <label for="description" class="form-label">Description</label>
-                <textarea id="description" name="description" class="form-control" required></textarea>
-              </div>
-              <div class="mb-3">
-                <label for="location" class="form-label">Location</label>
-                <input type="text" id="location" name="location" class="form-control" required>
-              </div>
-              <div class="mb-3">
-                <label for="duration" class="form-label">Duration</label>
-                <input type="text" id="duration" name="duration" class="form-control" required>
-              </div>
-              <div class="mb-3">
-                <label for="field" class="form-label">Field</label>
-                <input type="text" id="field" name="field" class="form-control" required>
-              </div>
-              <div class="mb-3">
-                <label for="image" class="form-label">Upload Image</label>
-                <input type="file" id="image" name="image" class="form-control" accept="image/*" required>
-              </div>
-              <button type="submit" name="submit" class="btn btn-primary">Mise à jour stage </button>
+            <?php if(isset($_GET['error'])): ?>
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    Erreur lors de la modification du stage. Veuillez réessayer.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            <?php endif; ?>
+            
+            <form action="InternshipManager.php" method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="action" value="update">
+                <input type="hidden" name="internship_id" value="<?php echo htmlspecialchars($internship['id']); ?>">
+
+                <div class="mb-3">
+                    <label for="title" class="form-label">Title</label>
+                    <input type="text" class="form-control" id="title" name="title" 
+                           value="<?php echo htmlspecialchars($internship['Title']); ?>" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="description" class="form-label">Description</label>
+                    <textarea class="form-control" id="description" name="description" 
+                              required rows="4"><?php echo htmlspecialchars($internship['Description']); ?></textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label for="location" class="form-label">Location</label>
+                    <input type="text" class="form-control" id="location" name="location" 
+                           value="<?php echo htmlspecialchars($internship['Location']); ?>" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="duration" class="form-label">Duration</label>
+                    <input type="text" class="form-control" id="duration" name="duration" 
+                           value="<?php echo htmlspecialchars($internship['Duration']); ?>" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="field" class="form-label">Field</label>
+                    <input type="text" class="form-control" id="field" name="field" 
+                           value="<?php echo htmlspecialchars($internship['Field']); ?>" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="image" class="form-label">Image</label>
+                    <?php if($internship['Image']): ?>
+                        <div class="mb-2">
+                            <img src="<?php echo htmlspecialchars($internship['Image']); ?>" 
+                                 alt="Current image" style="max-width: 200px;">
+                        </div>
+                    <?php endif; ?>
+                    <input type="file" class="form-control" id="image" name="image" accept="image/*">
+                </div>
+
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+                <a href="listeDesStages.php" class="btn btn-secondary">Cancel</a>
             </form>
-          </div>
         </div>
-      </div>
-      <!-- Content End -->
-      
-      <div class="py-6 px-6 text-center">
-        <p class="mb-0 fs-4">Design and Developed by <a href="https://adminmart.com/" target="_blank" class="text-primary text-decoration-underline">Learnify</a> Distributed by <a href="https://themewagon.com/" target="_blank" class="text-primary text-decoration-underline">Learnify</a></p>
-      </div>
     </div>
-  </div>
+</div>
 
-  <script src="../assets/libs/jquery/dist/jquery.min.js"></script>
-  <script src="../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="../assets/libs/simplebar/dist/simplebar.js"></script>
-  <script src="../assets/js/sidebarmenu.js"></script>
-  <script src="../assets/js/app.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.8/dist/iconify-icon.min.js"></script>
+            <div class="py-6 px-6 text-center">
+                <p class="mb-0 fs-4">Design and Developed by <a href="https://adminmart.com/" target="_blank" class="text-primary text-decoration-underline">Learnify</a> Distributed by <a href="https://themewagon.com/" target="_blank" class="text-primary text-decoration-underline">Learnify</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script src="../assets/libs/jquery/dist/jquery.min.js"></script>
+    <script src="../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/libs/simplebar/dist/simplebar.js"></script>
+    <script src="../assets/js/sidebarmenu.js"></script>
+    <script src="../assets/js/app.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.8/dist/iconify-icon.min.js"></script>
 </body>
-
 </html>

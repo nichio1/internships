@@ -85,40 +85,61 @@
       <!-- Header End -->
 
       <!-- Content Start -->
+      <!-- Previous HTML content remains the same -->
       <div class="container-fluid">
-        <div class="card">
-          <div class="card-body">
-            <h1 class="card-title fw-semibold mb-4">Ajouter un Stage</h1>
-            <form action="ajouter_stage.php" method="POST" enctype="multipart/form-data">
-              <div class="mb-3">
-                <label for="title" class="form-label">Title</label>
-                <input type="text" id="title" name="title" class="form-control" required>
+          <div class="card">
+              <div class="card-body">
+                  <h1 class="card-title fw-semibold mb-4">Ajouter un Stage</h1>
+                  <?php
+                  // Display success/error messages
+                  if(isset($_GET['success'])) {
+                      echo '<div class="alert alert-success alert-dismissible fade show" role="alert">
+                              Stage ajouté avec succès!
+                              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>';
+                  }
+                  
+                  if(isset($_GET['error'])) {
+                      echo '<div class="alert alert-danger alert-dismissible fade show" role="alert">
+                              Erreur lors de l\'ajout du stage. Veuillez réessayer.
+                              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>';
+                  }
+                  ?>
+                  <!-- Update the form action to point to InternshipManager.php directly -->
+                  <form action="InternshipManager.php" method="POST" enctype="multipart/form-data">
+                  <input type="hidden" name="action" value="add">
+
+                      <div class="mb-3">
+                          <label for="title" class="form-label">Title</label>
+                          <input type="text" id="title" name="title" class="form-control" required>
+                      </div>
+                      <div class="mb-3">
+                          <label for="description" class="form-label">Description</label>
+                          <textarea id="description" name="description" class="form-control" required></textarea>
+                      </div>
+                      <div class="mb-3">
+                          <label for="location" class="form-label">Location</label>
+                          <input type="text" id="location" name="location" class="form-control" required>
+                      </div>
+                      <div class="mb-3">
+                          <label for="duration" class="form-label">Duration</label>
+                          <input type="text" id="duration" name="duration" class="form-control" required>
+                      </div>
+                      <div class="mb-3">
+                          <label for="field" class="form-label">Field</label>
+                          <input type="text" id="field" name="field" class="form-control" required>
+                      </div>
+                      <div class="mb-3">
+                          <label for="image" class="form-label">Upload Image</label>
+                          <input type="file" id="image" name="image" class="form-control" accept="image/*" required>
+                      </div>
+                      <button type="submit" name="submit" class="btn btn-primary">Ajouter stage</button>
+                  </form>
               </div>
-              <div class="mb-3">
-                <label for="description" class="form-label">Description</label>
-                <textarea id="description" name="description" class="form-control" required></textarea>
-              </div>
-              <div class="mb-3">
-                <label for="location" class="form-label">Location</label>
-                <input type="text" id="location" name="location" class="form-control" required>
-              </div>
-              <div class="mb-3">
-                <label for="duration" class="form-label">Duration</label>
-                <input type="text" id="duration" name="duration" class="form-control" required>
-              </div>
-              <div class="mb-3">
-                <label for="field" class="form-label">Field</label>
-                <input type="text" id="field" name="field" class="form-control" required>
-              </div>
-              <div class="mb-3">
-                <label for="image" class="form-label">Upload Image</label>
-                <input type="file" id="image" name="image" class="form-control" accept="image/*" required>
-              </div>
-              <button type="submit" name="submit" class="btn btn-primary">Ajouter stage </button>
-            </form>
           </div>
-        </div>
       </div>
+<!-- Rest of your HTML remains the same -->
       <!-- Content End -->
       
       <div class="py-6 px-6 text-center">

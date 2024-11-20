@@ -1,5 +1,14 @@
-
 <!doctype html>
+<?php
+require_once 'config.php';
+
+$db = new Database();
+$conn = $db->getConnection();
+
+// Fetch internships from database
+$sql = "SELECT * FROM internship ORDER BY Title";
+$result = $conn->query($sql);
+?>
 <html lang="en">
 
 <head>
@@ -102,36 +111,37 @@
             </tr>
           </thead>
           <tbody class="table-group-divider">
-            <tr>
-              <th scope="row" class="ps-0 fw-medium">
-                <span class="table-link1 text-truncate d-block">Stage en Développement Web</span>
-              </th>
-              <td class="fw-medium">3 mois</td>
-              <td class="fw-medium">Développement Web</td>
-              <td class="fw-medium">Paris</td>
-              <td class="text-center">
-              <a href="modifierstage.php">
-    <button class="btn btn-warning btn-sm me-2">Modifier</button>
+  <?php
+  if ($result->num_rows > 0) {
+    while($row = $result->fetch_assoc()) {
+      ?>
+      <tr>
+        <th scope="row" class="ps-0 fw-medium">
+          <span class="table-link1 text-truncate d-block"><?php echo htmlspecialchars($row['Title']); ?></span>
+        </th>
+        <td class="fw-medium"><?php echo htmlspecialchars($row['Duration']); ?></td>
+        <td class="fw-medium"><?php echo htmlspecialchars($row['Field']); ?></td>
+        <td class="fw-medium"><?php echo htmlspecialchars($row['Location']); ?></td>
+        <td class="text-center">
+          <a href="modifierstage.php?id=<?php echo $row['id']; ?>">
+            <button class="btn btn-warning btn-sm me-2">Modifier</button>
+          </a>
+          <a href="supprimer.php?id=<?php echo $row['id']; ?>" class="btn btn-danger btn-sm">
+    <i class="ti ti-trash"></i> Supprimer
 </a>
-                <button class="btn btn-danger btn-sm">Supprimer</button>
-              </td>
-            </tr>
-            <tr>
-              <th scope="row" class="ps-0 fw-medium">
-                <span class="table-link1 text-truncate d-block">Stage en Marketing Digital</span>
-              </th>
-              <td class="fw-medium">6 mois</td>
-              <td class="fw-medium">Marketing</td>
-              <td class="fw-medium">Lyon</td>
-              <td class="text-center">
-              <a href="modifierstage.php">
-  <button class="btn btn-warning btn-sm me-2">Modifier</button>
-</a>
-                <button class="btn btn-danger btn-sm">Supprimer</button>
-              </td>
-            </tr>
-            <!-- Add more rows as needed -->
-          </tbody>
+        </td>
+      </tr>
+      <?php
+    }
+  } else {
+    ?>
+    <tr>
+      <td colspan="5" class="text-center">Aucun stage trouvé</td>
+    </tr>
+    <?php
+  }
+  ?>
+</tbody>
         </table>
       </div>
     </div>
