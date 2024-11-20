@@ -24,7 +24,7 @@ class InternshipManager {
             if(empty($data['title']) || empty($data['description']) || 
                empty($data['location']) || empty($data['duration']) || 
                empty($data['field'])) {
-                throw new Exception("All fields are required");
+                throw new Exception("sali a neby ammir lformule !!");
             }
 
             // Clean input data
