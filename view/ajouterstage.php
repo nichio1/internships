@@ -20,7 +20,7 @@
         <div class="brand-logo d-flex align-items-center justify-content-between">
           <a href="./index.html" class="text-nowrap logo-img">
             <img src="../assets/images/logos/logo-light.svg" alt="" />
-          </a>
+          </a>  
           <div class="close-btn d-xl-none d-block sidebartoggler cursor-pointer" id="sidebarCollapse">
             <i class="ti ti-x fs-8"></i>
           </div>
@@ -107,32 +107,32 @@
                   }
                   ?>
                   <!-- Update the form action to point to InternshipManager.php directly -->
-                  <form action="InternshipManager.php" method="POST" enctype="multipart/form-data">
+                  <form action="InternshipManager.php" method="POST" enctype="multipart/form-data" onsubmit="return validateInternshipForm()">
                   <input type="hidden" name="action" value="add">
 
                       <div class="mb-3">
                           <label for="title" class="form-label">Title</label>
-                          <input type="text" id="title" name="title" class="form-control" required>
+                          <input type="text" id="title" name="title" class="form-control" >
                       </div>
                       <div class="mb-3">
                           <label for="description" class="form-label">Description</label>
-                          <textarea id="description" name="description" class="form-control" required></textarea>
+                          <textarea id="description" name="description" class="form-control" ></textarea>
                       </div>
                       <div class="mb-3">
                           <label for="location" class="form-label">Location</label>
-                          <input type="text" id="location" name="location" class="form-control" required>
+                          <input type="text" id="location" name="location" class="form-control" >
                       </div>
                       <div class="mb-3">
                           <label for="duration" class="form-label">Duration</label>
-                          <input type="text" id="duration" name="duration" class="form-control" required>
-                      </div>
+                          <input type="text" id="duration" name="duration" class="form-control" >
+                      </div>  
                       <div class="mb-3">
                           <label for="field" class="form-label">Field</label>
-                          <input type="text" id="field" name="field" class="form-control" required>
+                          <input type="text" id="field" name="field" class="form-control" >
                       </div>
                       <div class="mb-3">
                           <label for="image" class="form-label">Upload Image</label>
-                          <input type="file" id="image" name="image" class="form-control" accept="image/*" required>
+                          <input type="file" id="image" name="image" class="form-control" accept="image/*" >
                       </div>
                       <button type="submit" name="submit" class="btn btn-primary">Ajouter stage</button>
                   </form>
@@ -155,5 +155,93 @@
   <script src="../assets/js/app.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.8/dist/iconify-icon.min.js"></script>
 </body>
+
+<script>
+function validateInternshipForm() {
+    // Get all form inputs
+    const title = document.getElementById('title').value.trim();
+    const description = document.getElementById('description').value.trim();
+    const location = document.getElementById('location').value.trim();
+    const duration = document.getElementById('duration').value.trim();
+    const field = document.getElementById('field').value.trim();
+    const image = document.getElementById('image').value;
+
+    // Clear any existing error messages
+    clearErrors();
+
+    let isValid = true;
+    const errors = [];
+
+    // Validate Title (minimum 3 characters)
+    if (title.length < 3) {
+        showError('title', 'Title must be at least 3 characters long');
+        isValid = false;
+    }
+
+    // Validate Description (minimum 10 characters)
+    if (description.length < 10) {
+        showError('description', 'Description must be at least 10 characters long');
+        isValid = false;
+    }
+
+    // Validate Location
+    if (location.length < 2) {
+        showError('location', 'Please enter a valid location');
+        isValid = false;
+    }
+
+    // Validate Duration (can add specific format validation if needed)
+    if (duration.length < 1) {
+        showError('duration', 'Please enter a valid duration');
+        isValid = false;
+    }
+
+    // Validate Field
+    if (field.length < 2) {
+        showError('field', 'Please enter a valid field');
+        isValid = false;
+    }
+
+    // Validate Image
+    if (!image && !document.querySelector('form').getAttribute('data-edit')) {
+        showError('image', 'Please select an image');
+        isValid = false;
+    }
+
+    return isValid;
+}
+
+function showError(fieldId, message) {
+    const field = document.getElementById(fieldId);
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'error-message text-danger mt-1';
+    errorDiv.innerHTML = message;
+    field.parentNode.appendChild(errorDiv);
+    field.classList.add('is-invalid');
+}
+
+function clearErrors() {
+    // Remove all error messages
+    const errorMessages = document.querySelectorAll('.error-message');
+    errorMessages.forEach(error => error.remove());
+
+    // Remove invalid class from inputs
+    const inputs = document.querySelectorAll('.form-control');
+    inputs.forEach(input => input.classList.remove('is-invalid'));
+}
+
+// Add some CSS for error styling
+const style = document.createElement('style');
+style.textContent = `
+    .error-message {
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+    .is-invalid {
+        border-color: #dc3545;
+    }
+`;
+document.head.appendChild(style);
+</script>
 
 </html>

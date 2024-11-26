@@ -15,18 +15,32 @@ class InternshipManager {
     }
     
     
+    
     public function addInternship($data, $file) {
         try {
-            // Debug output
-            error_log("Adding internship with data: " . print_r($data, true));
+            // Validate required fields with specific messages
+            $errors = [];
             
-            // Validate required fields
-            if(empty($data['title']) || empty($data['description']) || 
-               empty($data['location']) || empty($data['duration']) || 
-               empty($data['field'])) {
-                throw new Exception("sali a neby ammir lformule !!");
+            if(empty($data['title']) || strlen($data['title']) < 3) {
+                $errors[] = "Title must be at least 3 characters long";
             }
-
+            if(empty($data['description']) || strlen($data['description']) < 10) {
+                $errors[] = "Description must be at least 10 characters long";
+            }
+            if(empty($data['location'])) {
+                $errors[] = "Location is required";
+            }
+            if(empty($data['duration'])) {
+                $errors[] = "Duration is required";
+            }
+            if(empty($data['field'])) {
+                $errors[] = "Field is required";
+            }
+    
+            if (!empty($errors)) {
+                throw new Exception(implode(", ", $errors));
+            }
+    
             // Clean input data
             $title = $this->db->cleanInput($data['title']);
             $description = $this->db->cleanInput($data['description']);
@@ -38,22 +52,25 @@ class InternshipManager {
             $target_dir = "../uploads/";
             $image_path = "";
             
+            // Create uploads directory if it doesn't exist
             if (!file_exists($target_dir)) {
-                if (!mkdir($target_dir, 0777, true)) {
-                    throw new Exception("Failed to create upload directory");
-                }
+                mkdir($target_dir, 0777, true);
             }
             
+            // Process image upload if provided
             if(isset($file["image"]) && $file["image"]["error"] == 0) {
+                // Verify if it's actually an image
                 $check = getimagesize($file["image"]["tmp_name"]);
                 if($check === false) {
                     throw new Exception("File is not an image.");
                 }
-
+                
+                // Generate unique filename
                 $file_extension = pathinfo($file["image"]["name"], PATHINFO_EXTENSION);
                 $new_filename = uniqid() . '.' . $file_extension;
                 $target_file = $target_dir . $new_filename;
                 
+                // Move uploaded file
                 if (!move_uploaded_file($file["image"]["tmp_name"], $target_file)) {
                     throw new Exception("Error uploading file.");
                 }
@@ -61,7 +78,7 @@ class InternshipManager {
                 $image_path = $target_file;
             }
             
-            // Prepare SQL statement
+            // Prepare and execute SQL statement
             $sql = "INSERT INTO internship (Title, Description, Location, Duration, Field, Image) 
                     VALUES (?, ?, ?, ?, ?, ?)";
             
@@ -73,13 +90,16 @@ class InternshipManager {
             $stmt->bind_param("ssssss", $title, $description, $location, $duration, $field, $image_path);
             
             if (!$stmt->execute()) {
+                // If file was uploaded but database insert failed, delete the uploaded file
+                if (!empty($image_path) && file_exists($image_path)) {
+                    unlink($image_path);
+                }
                 throw new Exception("Execute failed: " . $stmt->error);
             }
             
             $stmt->close();
-            error_log("Successfully added internship");
             return true;
-
+    
         } catch (Exception $e) {
             error_log("Error adding internship: " . $e->getMessage());
             return false;
@@ -213,50 +233,64 @@ class InternshipManager {
     }
 }
 
-// Handle form submission
+header('Content-Type: application/json');
+
 if(isset($_POST['action'])) {
     error_log("Received POST action: " . $_POST['action']);
     error_log("POST data: " . print_r($_POST, true));
     error_log("FILES data: " . print_r($_FILES, true));
 
     $internshipManager = new InternshipManager();
+    $isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && 
+              strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
     
     switch($_POST['action']) {
         case 'add':
             $result = $internshipManager->addInternship($_POST, $_FILES);
             error_log("Add result: " . ($result ? "success" : "failure"));
             
-            if($result) {
-                error_log("Redirecting to success page");
-                header("Location: listeDesStages.php?success=1");
-                exit();
+            if($isAjax) {
+                echo json_encode([
+                    'success' => $result,
+                    'message' => $result ? 'Stage ajouté avec succès!' : 'Erreur lors de l\'ajout du stage',
+                    'redirect' => 'listeDesStages.php'
+                ]);
             } else {
-                error_log("Redirecting to error page");
-                header("Location: listeDesStages.php?error=1");
-                exit();
+                header("Location: listeDesStages.php?" . ($result ? "success=1" : "error=1"));
             }
             break;
             
         case 'update':
             if(isset($_POST['internship_id'])) {
-                if($internshipManager->updateInternship($_POST['internship_id'], $_POST, $_FILES)) {
-                    header("Location: listeDesStages.php?success=1");
+                $result = $internshipManager->updateInternship($_POST['internship_id'], $_POST, $_FILES);
+                if($isAjax) {
+                    echo json_encode([
+                        'success' => $result,
+                        'message' => $result ? 'Stage mis à jour avec succès!' : 'Erreur lors de la mise à jour',
+                        'redirect' => 'listeDesStages.php'
+                    ]);
                 } else {
-                    header("Location: modifier.php?id=" . $_POST['internship_id'] . "&error=1");
+                    header("Location: " . ($result ? 
+                        "listeDesStages.php?success=1" : 
+                        "modifier.php?id=" . $_POST['internship_id'] . "&error=1"));
                 }
             }
             break;
 
         case 'delete':
             if(isset($_POST['internship_id'])) {
-                if($internshipManager->deleteInternship($_POST['internship_id'])) {
-                    header("Location: listeDesStages.php?success=2"); // 2 for successful deletion
+                $result = $internshipManager->deleteInternship($_POST['internship_id']);
+                if($isAjax) {
+                    echo json_encode([
+                        'success' => $result,
+                        'message' => $result ? 'Stage supprimé avec succès!' : 'Erreur lors de la suppression',
+                        'redirect' => 'listeDesStages.php'
+                    ]);
                 } else {
-                    header("Location: listeDesStages.php?error=2"); // 2 for deletion error
+                    header("Location: listeDesStages.php?" . ($result ? "success=2" : "error=2"));
                 }
             }
             break;
     }
     exit();
 }
-?>
