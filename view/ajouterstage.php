@@ -8,6 +8,16 @@
   <link rel="shortcut icon" type="image/png" href="../assets/images/logos/seodashlogo.png" />
   <link rel="stylesheet" href="../../node_modules/simplebar/dist/simplebar.min.css">
   <link rel="stylesheet" href="../assets/css/styles.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
+<style>
+    .datepicker {
+        z-index: 1600 !important; /* Ensures datepicker shows above other elements */
+    }
+    .input-group-text {
+        cursor: pointer;
+    }
+</style>
+
 </head>
 
 <body>
@@ -108,34 +118,52 @@
                   ?>
                   <!-- Update the form action to point to InternshipManager.php directly -->
                   <form action="InternshipManager.php" method="POST" enctype="multipart/form-data" onsubmit="return validateInternshipForm()">
-                  <input type="hidden" name="action" value="add">
+    <input type="hidden" name="action" value="add">
 
-                      <div class="mb-3">
-                          <label for="title" class="form-label">Title</label>
-                          <input type="text" id="title" name="title" class="form-control" >
-                      </div>
-                      <div class="mb-3">
-                          <label for="description" class="form-label">Description</label>
-                          <textarea id="description" name="description" class="form-control" ></textarea>
-                      </div>
-                      <div class="mb-3">
-                          <label for="location" class="form-label">Location</label>
-                          <input type="text" id="location" name="location" class="form-control" >
-                      </div>
-                      <div class="mb-3">
-                          <label for="duration" class="form-label">Duration</label>
-                          <input type="text" id="duration" name="duration" class="form-control" >
-                      </div>  
-                      <div class="mb-3">
-                          <label for="field" class="form-label">Field</label>
-                          <input type="text" id="field" name="field" class="form-control" >
-                      </div>
-                      <div class="mb-3">
-                          <label for="image" class="form-label">Upload Image</label>
-                          <input type="file" id="image" name="image" class="form-control" accept="image/*" >
-                      </div>
-                      <button type="submit" name="submit" class="btn btn-primary">Ajouter stage</button>
-                  </form>
+    <div class="mb-3">
+        <label for="title" class="form-label">Title</label>
+        <input type="text" id="title" name="title" class="form-control">
+    </div>
+    <div class="mb-3">
+        <label for="description" class="form-label">Description</label>
+        <textarea id="description" name="description" class="form-control"></textarea>
+    </div>
+    <div class="mb-3">
+        <label for="location" class="form-label">Location</label>
+        <input type="text" id="location" name="location" class="form-control">
+    </div>
+    <div class="mb-3">
+        <label for="start_date" class="form-label">Start Date</label>
+        <div class="input-group">
+            <input type="text" class="form-control" id="start_date" name="start_date" readonly>
+            <span class="input-group-text" id="start_date_icon">
+                <i class="ti ti-calendar"></i>
+            </span>
+        </div>
+    </div>
+    <div class="mb-3">
+        <label for="end_date" class="form-label">End Date</label>
+        <div class="input-group">
+            <input type="text" class="form-control" id="end_date" name="end_date" readonly>
+            <span class="input-group-text" id="end_date_icon">
+                <i class="ti ti-calendar"></i>
+            </span>
+        </div>
+    </div>
+    <div class="mb-3">
+        <label for="duration" class="form-label">Duration</label>
+        <input type="text" id="duration" name="duration" class="form-control" readonly>
+    </div>
+    <div class="mb-3">
+        <label for="field" class="form-label">Field</label>
+        <input type="text" id="field" name="field" class="form-control">
+    </div>
+    <div class="mb-3">
+        <label for="image" class="form-label">Upload Image</label>
+        <input type="file" id="image" name="image" class="form-control" accept="image/*">
+    </div>
+    <button type="submit" name="submit" class="btn btn-primary">Ajouter stage</button>
+</form>
               </div>
           </div>
       </div>
@@ -154,6 +182,9 @@
   <script src="../assets/js/sidebarmenu.js"></script>
   <script src="../assets/js/app.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.8/dist/iconify-icon.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/locales/bootstrap-datepicker.fr.min.js"></script>
+
 </body>
 
 <script>
@@ -242,6 +273,78 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
+</script>
+<script>
+$(document).ready(function() {
+    // Initialize datepickers
+    $('#start_date, #end_date').datepicker({
+        format: 'dd/mm/yyyy',
+        autoclose: true,
+        language: 'fr',
+        todayHighlight: true,
+        startDate: new Date()
+    });
+
+    // Handle calendar icon clicks
+    $('#start_date_icon').click(function() {
+        $('#start_date').datepicker('show');
+    });
+
+    $('#end_date_icon').click(function() {
+        $('#end_date').datepicker('show');
+    });
+
+    // Calculate duration when dates change
+    function calculateDuration() {
+        const startDate = $('#start_date').datepicker('getDate');
+        const endDate = $('#end_date').datepicker('getDate');
+
+        if (startDate && endDate) {
+            // Calculate the difference in months
+            const months = (endDate.getFullYear() - startDate.getFullYear()) * 12 + 
+                          (endDate.getMonth() - startDate.getMonth());
+            const days = Math.floor((endDate - startDate) / (1000 * 60 * 60 * 24));
+
+            let duration = '';
+            if (months > 0) {
+                duration += months + (months === 1 ? ' mois ' : ' mois ');
+            }
+            if (days % 30 > 0) {
+                duration += (days % 30) + (days % 30 === 1 ? ' jour' : ' jours');
+            }
+            $('#duration').val(duration.trim());
+        }
+    }
+
+    // Update duration when dates change
+    $('#start_date, #end_date').on('changeDate', calculateDuration);
+
+    // Add date validation to the form validation
+    const originalValidateForm = window.validateInternshipForm;
+    window.validateInternshipForm = function() {
+        const isOriginalValid = originalValidateForm();
+        const startDate = $('#start_date').val();
+        const endDate = $('#end_date').val();
+
+        if (!startDate) {
+            showError('start_date', 'Start date is required');
+            return false;
+        }
+        if (!endDate) {
+            showError('end_date', 'End date is required');
+            return false;
+        }
+
+        const start = $('#start_date').datepicker('getDate');
+        const end = $('#end_date').datepicker('getDate');
+        if (start && end && start > end) {
+            showError('end_date', 'End date must be after start date');
+            return false;
+        }
+
+        return isOriginalValid;
+    };
+});
 </script>
 
 </html>
