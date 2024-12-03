@@ -11,8 +11,11 @@
     };
     spinner();
 
+    
+
     // Initiate the wowjs
     new WOW().init();
+    
 
     // Add form submission handling
     $('form[action="InternshipManager.php"]').on('submit', function(e) {
@@ -53,6 +56,7 @@
             $('.sticky-top').css('top', '-100px');
         }
     });
+    
 
     // Dropdown on mouse hover
     const $dropdown = $(".dropdown");
